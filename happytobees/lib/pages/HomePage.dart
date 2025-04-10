@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'AuthPage.dart';
+import 'package:happytobees/pages/Auth/AuthPage.dart';
 
 
 class HomePage extends StatelessWidget {
