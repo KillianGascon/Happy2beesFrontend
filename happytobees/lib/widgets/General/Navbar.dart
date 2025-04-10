@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:happytobees/pages/Profile/ProfilePage.dart';
+import 'package:happytobees/pages/HomePage.dart';
+import 'package:happytobees/pages/Dashboard.dart';
 
 class CustomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -28,44 +31,66 @@ class CustomNavBar extends StatelessWidget {
             ),
           ],
         ),
-        child: BottomAppBar(
-          color: Colors.transparent,
-          elevation: 0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Center(
-                child: IconButton(
-                  padding: EdgeInsets.zero, // Supprime le padding interne
-                  icon: Icon(
-                    Icons.dashboard,
-                    color: currentIndex == 0 ? Colors.blue : Colors.grey,
+        child: Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomePage()),
+                  );
+                },
+                child: Container(
+                  color: Colors.transparent, // Zone cliquable transparente
+                  child: Center(
+                    child: Icon(
+                      Icons.dashboard,
+                      color: currentIndex == 0 ? Colors.blue : Colors.grey,
+                    ),
                   ),
-                  onPressed: () => onTap(0),
                 ),
               ),
-              Center(
-                child: IconButton(
-                  padding: EdgeInsets.zero, // Supprime le padding interne
-                  icon: Icon(
-                    Icons.assignment,
-                    color: currentIndex == 1 ? Colors.blue : Colors.grey,
+            ),
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DashboardPage()),
+                  );
+                },
+                child: Container(
+                  color: Colors.transparent, // Zone cliquable transparente
+                  child: Center(
+                    child: Icon(
+                      Icons.assignment,
+                      color: currentIndex == 1 ? Colors.blue : Colors.grey,
+                    ),
                   ),
-                  onPressed: () => onTap(1),
                 ),
               ),
-              Center(
-                child: IconButton(
-                  padding: EdgeInsets.zero, // Supprime le padding interne
-                  icon: Icon(
-                    Icons.person,
-                    color: currentIndex == 2 ? Colors.blue : Colors.grey,
+            ),
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ProfilePage()),
+                  );
+                },
+                child: Container(
+                  color: Colors.transparent, // Zone cliquable transparente
+                  child: Center(
+                    child: Icon(
+                      Icons.person,
+                      color: currentIndex == 2 ? Colors.blue : Colors.grey,
+                    ),
                   ),
-                  onPressed: () => onTap(2),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../pages/Dashboard.dart';
+import 'package:happytobees/pages/Dashboard.dart';
 
 class LoginWidget extends StatefulWidget {
   final PageController pageController;

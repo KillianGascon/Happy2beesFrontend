@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import '../../pages/TermsAndConditionsPage.dart';
+import 'package:happytobees/pages/Auth/TermsAndConditionsPage.dart';
 
 class SignUpWidget extends StatefulWidget {
   final PageController pageController;
