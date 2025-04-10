@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../pages/Dashboard.dart';
+
 class LoginWidget extends StatefulWidget {
   final PageController pageController;
   final Function(int) onPageChanged;
@@ -185,7 +187,11 @@ class _LoginWidgetState extends State<LoginWidget> {
                   padding: EdgeInsets.symmetric(vertical: 15),
                 ),
                 onPressed: () {
-                  // Action pour se connecter
+                  // Redirige vers le Dashboard
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DashboardPage()),
+                  );
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
