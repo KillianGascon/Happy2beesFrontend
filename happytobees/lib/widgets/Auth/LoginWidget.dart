@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:happytobees/pages/Dashboard.dart';
+import 'package:http/http.dart' as http;
 
 class LoginWidget extends StatefulWidget {
   final PageController pageController;
@@ -12,8 +14,77 @@ class LoginWidget extends StatefulWidget {
 }
 
 class _LoginWidgetState extends State<LoginWidget> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = false;
+  bool _isLoading = false;
+
+  Future<void> _login() async {
+    final String email = _emailController.text;
+    final String password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Veuillez remplir tous les champs.")),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final url = Uri.parse('http://api.syntaxlab.fr:8001/api/utilisateurs/login');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password}),
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      // Check if the response is valid and contains data
+      if (response.statusCode == 200) {
+        if (response.body.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Erreur : La réponse de l'API est vide")),
+          );
+          return;
+        }
+
+        final responseBody = jsonDecode(response.body);
+        if (responseBody['message'] != null) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text("Erreur : ${responseBody['message']}")));
+        } else {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text("Connexion réussie !")));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const DashboardPage()),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erreur : Code de statut ${response.statusCode}")),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Erreur de connexion : $e")));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,13 +113,18 @@ class _LoginWidgetState extends State<LoginWidget> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      widget.pageController.animateToPage(0,
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeInOut);
+                      widget.pageController.animateToPage(
+                        0,
+                        duration: Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
                       widget.onPageChanged(0);
                     },
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 40,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [Color(0xFFD04C03), Color(0xFFEBCF8D)],
@@ -70,13 +146,18 @@ class _LoginWidgetState extends State<LoginWidget> {
                   SizedBox(width: 10),
                   GestureDetector(
                     onTap: () {
-                      widget.pageController.animateToPage(1,
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeInOut);
+                      widget.pageController.animateToPage(
+                        1,
+                        duration: Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
                       widget.onPageChanged(1);
                     },
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.transparent,
                         borderRadius: BorderRadius.circular(360),
@@ -97,14 +178,12 @@ class _LoginWidgetState extends State<LoginWidget> {
             SizedBox(height: 24),
             Text(
               "Login",
-              style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
               textAlign: TextAlign.left,
             ),
             SizedBox(height: 24),
             TextField(
+              controller: _emailController,
               cursorColor: Color(0xFF292927),
               style: TextStyle(color: Colors.black),
               decoration: InputDecoration(
@@ -125,6 +204,7 @@ class _LoginWidgetState extends State<LoginWidget> {
             ),
             SizedBox(height: 24),
             TextField(
+              controller: _passwordController,
               cursorColor: Color(0xFF292927),
               obscureText: _obscurePassword,
               decoration: InputDecoration(
@@ -158,9 +238,9 @@ class _LoginWidgetState extends State<LoginWidget> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Theme(
-                  data: Theme.of(context).copyWith(
-                    unselectedWidgetColor: Color(0xFFD04C03),
-                  ),
+                  data: Theme.of(
+                    context,
+                  ).copyWith(unselectedWidgetColor: Color(0xFFD04C03)),
                   child: Checkbox(
                     activeColor: Color(0xFFD04C03),
                     value: _rememberMe,
@@ -185,14 +265,11 @@ class _LoginWidgetState extends State<LoginWidget> {
                   ),
                   padding: EdgeInsets.symmetric(vertical: 15),
                 ),
-                onPressed: () {
-                  // Redirige vers le Dashboard
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const DashboardPage()),
-                  );
-                },
-                child: Row(
+                onPressed: _isLoading ? null : _login,
+                child:
+                _isLoading
+                    ? CircularProgressIndicator(color: Colors.white)
+                    : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
@@ -204,10 +281,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                       ),
                     ),
                     SizedBox(width: 10),
-                    Icon(
-                      Icons.arrow_forward,
-                      color: Colors.white,
-                    ),
+                    Icon(Icons.arrow_forward, color: Colors.white),
                   ],
                 ),
               ),
@@ -215,9 +289,11 @@ class _LoginWidgetState extends State<LoginWidget> {
             Center(
               child: TextButton(
                 onPressed: () {
-                  widget.pageController.animateToPage(1,
-                      duration: Duration(milliseconds: 300),
-                      curve: Curves.easeInOut);
+                  widget.pageController.animateToPage(
+                    1,
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
                   widget.onPageChanged(1);
                 },
                 child: Text(

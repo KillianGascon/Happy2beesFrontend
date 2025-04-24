@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+
+final _dateFormatter = MaskTextInputFormatter(mask: '####-##-##', filter: {"#": RegExp(r'[0-9]')});
 
 class SignUpWidget extends StatefulWidget {
   final PageController pageController;
@@ -137,9 +140,26 @@ class _SignUpWidgetState extends State<SignUpWidget> {
               TextFormField(
                 controller: _dateNaissanceController,
                 decoration: InputDecoration(labelText: "Date de naissance (YYYY-MM-DD)"),
-                validator: (value) => value!.isEmpty ? "Veuillez entrer votre date de naissance" : null,
+                keyboardType: TextInputType.number,
+                inputFormatters: [_dateFormatter],
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Veuillez entrer votre date de naissance";
+                  }
+                  // Validation supplémentaire pour vérifier si la date est valide
+                  final dateParts = value.split("-");
+                  if (dateParts.length == 3) {
+                    try {
+                      DateTime.parse(value);
+                    } catch (_) {
+                      return "Format de date invalide";
+                    }
+                  } else {
+                    return "Format de date invalide";
+                  }
+                  return null;
+                },
               ),
-              SizedBox(height: 10),
               TextFormField(
                 controller: _passwordController,
                 decoration: InputDecoration(labelText: "Mot de passe"),
