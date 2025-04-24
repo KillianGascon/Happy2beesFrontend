@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:happytobees/widgets/General/Navbar.dart';
+import 'package:happytobees/widgets/nest/ruche.dart';
+import 'package:happytobees/API/ruche_service.dart';
 
 class DashboardCard extends StatelessWidget {
   final String title;
@@ -58,14 +60,111 @@ class DashboardListTile extends StatelessWidget {
 }
 
 
-class DashboardPage extends StatelessWidget {
+// class DashboardPage extends StatelessWidget {
+//   const DashboardPage({super.key});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         automaticallyImplyLeading: false, // Supprime la flèche de retour
+//         title: const Text('Mon Dash'),
+//         actions: [
+//           IconButton(
+//             icon: const Icon(Icons.add),
+//             onPressed: () {},
+//           ),
+//         ],
+//       ),
+//       body: SingleChildScrollView(
+//         child: Column(
+//           children: [
+//             // Section "Mes ruches"
+//             Padding(
+//               padding: const EdgeInsets.all(16.0),
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   const Text(
+//                     'Mes ruches',
+//                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+//                   ),
+//                   const SizedBox(height: 8),
+//                   Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     children: [
+//                       DashboardCard(title: 'Ruche 1', subtitle: 'X Cadres'),
+//                       DashboardCard(title: 'Ruche 2', subtitle: 'X Cadres'),
+//                     ],
+//                   ),
+//                   const SizedBox(height: 8),
+//                   Row(
+//                     children: [
+//                       DashboardCard(title: 'Ruche 3', subtitle: 'X Cadres'),
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//             ),
+//             const Divider(),
+//             // Section "Mes interventions"
+//             Padding(
+//               padding: const EdgeInsets.all(16.0),
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   const Text(
+//                     'Mes Interventions',
+//                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+//                   ),
+//                   const SizedBox(height: 8),
+//                   Column(
+//                     children: List.generate(
+//                       4,
+//                           (index) => const DashboardListTile(
+//                         title: 'Intervention',
+//                         subtitle: 'Intervention sur les cadres',
+//                       ),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//       bottomNavigationBar: CustomNavBar(
+//         currentIndex: 0, // Indique l'onglet actuellement sélectionné
+//         onTap: (index) {
+//           // Logique de navigation entre les onglets
+//           print('Onglet sélectionné : $index');
+//         },
+//       ),
+//     );
+//   }
+// }
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  late Future<List<Ruche>> futureRuches;
+  final RucheService rucheService = RucheService(); // Instanciation de RucheService
+
+  @override
+  void initState() {
+    super.initState();
+    futureRuches = rucheService.fetchRuches(); // Appel de la méthode fetchRuches
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, // Supprime la flèche de retour
+        automaticallyImplyLeading: false,
         title: const Text('Mon Dash'),
         actions: [
           IconButton(
@@ -74,67 +173,48 @@ class DashboardPage extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Section "Mes ruches"
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Mes ruches',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      DashboardCard(title: 'Ruche 1', subtitle: 'X Cadres'),
-                      DashboardCard(title: 'Ruche 2', subtitle: 'X Cadres'),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      DashboardCard(title: 'Ruche 3', subtitle: 'X Cadres'),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const Divider(),
-            // Section "Mes interventions"
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Mes Interventions',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Column(
-                    children: List.generate(
-                      4,
-                          (index) => const DashboardListTile(
-                        title: 'Intervention',
-                        subtitle: 'Intervention sur les cadres',
-                      ),
+      body: FutureBuilder<List<Ruche>>(
+        future: futureRuches,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Erreur : ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Aucune ruche trouvée.'));
+          } else {
+            List<Ruche> ruches = snapshot.data!;
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Mes ruches',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8.0,
+                      runSpacing: 8.0,
+                      children: ruches.map((ruche) {
+                        return DashboardCard(
+                          title: ruche.nomRuche,
+                          subtitle: '${ruche.nombreCadresGlobal} cadres',
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
+            );
+          }
+        },
       ),
       bottomNavigationBar: CustomNavBar(
-        currentIndex: 0, // Indique l'onglet actuellement sélectionné
+        currentIndex: 0,
         onTap: (index) {
-          // Logique de navigation entre les onglets
           print('Onglet sélectionné : $index');
         },
       ),
