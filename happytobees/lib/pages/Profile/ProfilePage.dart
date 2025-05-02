@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:happytobees/pages/Profile/ProfileDetailPage.dart';
+import 'package:happytobees/providers/auth_provider.dart';
 import 'package:happytobees/widgets/General/Navbar.dart';
+import 'package:provider/provider.dart';
 
 class ProfileOption extends StatelessWidget {
   final IconData icon;
   final String title;
+  final VoidCallback onTap;
 
   const ProfileOption({
     super.key,
     required this.icon,
     required this.title,
+    required this.onTap,
   });
 
   @override
@@ -75,13 +80,15 @@ class ProfilePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 // Nom et Email
-                const Text(
-                  'Ruben Geidt',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  // Remplacer par l'email de l'utilisateur stocké dans le provider
+                  '${Provider.of<AuthProvider>(context).nomprenom}',
+                  style: TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'ruben.geidt@example.com',
+                Text(
+                  // Remplacer par l'email de l'utilisateur stocké dans le provider
+                  '${Provider.of<AuthProvider>(context).email}',
                   style: TextStyle(color: Colors.grey),
                 ),
               ],
@@ -92,22 +99,40 @@ class ProfilePage extends StatelessWidget {
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(16.0),
-              children: const [
+              children: [
                 ProfileOption(
                   icon: Icons.person,
                   title: 'Profile details',
+                  onTap: () {
+                    // Naviguer vers la page de détails du profil sans passer l'ID
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProfileDetailPage(),
+                      ),
+                    );
+                  },
                 ),
                 ProfileOption(
                   icon: Icons.settings,
                   title: 'Settings',
+                  onTap: () {
+                    // Ajouter la logique pour Settings ici
+                  },
                 ),
                 ProfileOption(
                   icon: Icons.support_agent,
                   title: 'Support',
+                  onTap: () {
+                    // Ajouter la logique pour Support ici
+                  },
                 ),
                 ProfileOption(
                   icon: Icons.logout,
                   title: 'Logout',
+                  onTap: () {
+                    // Ajouter la logique pour Logout ici
+                  },
                 ),
               ],
             ),

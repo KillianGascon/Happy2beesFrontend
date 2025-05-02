@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:happytobees/pages/Dashboard.dart';
 import 'package:http/http.dart' as http;
+import 'package:happytobees/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class LoginWidget extends StatefulWidget {
   final PageController pageController;
@@ -48,7 +50,6 @@ class _LoginWidgetState extends State<LoginWidget> {
         _isLoading = false;
       });
 
-      // Check if the response is valid and contains data
       if (response.statusCode == 200) {
         if (response.body.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -57,19 +58,43 @@ class _LoginWidgetState extends State<LoginWidget> {
           return;
         }
 
+        print("Réponse de l'API : ${response.body}");  // Afficher le corps de la réponse
+
         final responseBody = jsonDecode(response.body);
+        print("Réponse JSON : $responseBody");  // Vérifie le contenu de la réponse JSON
+
         if (responseBody['message'] != null) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text("Erreur : ${responseBody['message']}")));
-        } else {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text("Connexion réussie !")));
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const DashboardPage()),
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Erreur : ${responseBody['message']}")),
           );
+        } else {
+          final user = responseBody['user'];  // Récupère l'objet 'user'
+          final userId = user['id'];  // Accède à l'ID de l'utilisateur à partir de 'user'
+          final userMail = user['mail'];  // Récupère l'email de l'utilisateur
+          // Récupère le nom et prenom de l'apiculteur et les concatène
+          final nomprenom = "${user['nom_apiculteur']} ${user['prenom_apiculteur']}";
+          final token = responseBody['token'];  // Récupère le token
+
+          print("ID de l'utilisateur : $userId");  // Affiche l'ID de l'utilisateur
+          print("Email de l'utilisateur : $userMail");  // Affiche l'email de l'utilisateur
+          print("Nom et prénom de l'apiculteur : $nomprenom");  // Affiche le nom et prénom
+          print("Token : $token");  // Affiche le token pour vérifier sa présence
+
+          if (userId != null && token != null) {
+            Provider.of<AuthProvider>(context, listen: false).setAuthData(userId, token, userMail, nomprenom);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Connexion réussie !")),
+            );
+
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const DashboardPage()),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Erreur : ID ou token manquant")),
+            );
+          }
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -80,9 +105,9 @@ class _LoginWidgetState extends State<LoginWidget> {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Erreur de connexion : $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erreur de connexion : $e")),
+      );
     }
   }
 
