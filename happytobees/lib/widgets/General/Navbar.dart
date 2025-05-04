@@ -38,25 +38,6 @@ class CustomNavBar extends StatelessWidget {
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
-                  );
-                },
-                child: Container(
-                  color: Colors.transparent, // Zone cliquable transparente
-                  child: Center(
-                    child: Icon(
-                      Icons.dashboard,
-                      color: currentIndex == 0 ? Colors.blue : Colors.grey,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
                     MaterialPageRoute(builder: (context) => const DashboardPage()),
                   );
                 },
