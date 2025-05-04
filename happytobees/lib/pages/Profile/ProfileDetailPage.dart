@@ -18,7 +18,8 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final userId = authProvider.userId;
 
-    final url = Uri.parse('http://api.syntaxlab.fr:8001/utilisateurs/$userId');
+    final url = Uri.parse(
+        'http://api.syntaxlab.fr:8001/api/utilisateurs/$userId');
 
     try {
       final response = await http.get(url);
@@ -53,42 +54,58 @@ class _ProfileDetailPageState extends State<ProfileDetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Détails du Profil'),
+        centerTitle: true,
+        elevation: 0,
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
+          : _userDetails.isEmpty
+          ? Center(child: Text('Impossible de charger les données utilisateur'))
           : Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Centre l'avatar
+            Center(
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.purple[100],
+                child: Icon(Icons.person, size: 50, color: Colors.white),
+              ),
+            ),
+            SizedBox(height: 16),
             Text(
-              'Nom: ${_userDetails['user']?['nom_apiculteur'] ?? 'Non disponible'}',
-              style: TextStyle(fontSize: 18),
+              'Nom: ${_userDetails['nom_apiculteur'] ?? 'Non disponible'}',
+              style: TextStyle(fontSize: 18, color: Colors.black),
             ),
             SizedBox(height: 10),
             Text(
-              'Prénom: ${_userDetails['user']?['prenom_apiculteur'] ?? 'Non disponible'}',
-              style: TextStyle(fontSize: 18),
+              'Prénom: ${_userDetails['prenom_apiculteur'] ??
+                  'Non disponible'}',
+              style: TextStyle(fontSize: 18, color: Colors.black),
             ),
             SizedBox(height: 10),
             Text(
-              'Email: ${_userDetails['user']?['mail'] ?? 'Non disponible'}',
-              style: TextStyle(fontSize: 18),
+              'Email: ${_userDetails['mail'] ?? 'Non disponible'}',
+              style: TextStyle(fontSize: 18, color: Colors.black),
             ),
             SizedBox(height: 10),
             Text(
-              'Téléphone: ${_userDetails['user']?['telephone'] ?? 'Non disponible'}',
-              style: TextStyle(fontSize: 18),
+              'Téléphone: ${_userDetails['telephone'] ?? 'Non disponible'}',
+              style: TextStyle(fontSize: 18, color: Colors.black),
             ),
             SizedBox(height: 10),
             Text(
-              'Numéro Apiculteur: ${_userDetails['user']?['numero_apiculteur'] ?? 'Non disponible'}',
-              style: TextStyle(fontSize: 18),
+              'Numéro Apiculteur: ${_userDetails['numero_apiculteur'] ??
+                  'Non disponible'}',
+              style: TextStyle(fontSize: 18, color: Colors.black),
             ),
             SizedBox(height: 10),
             Text(
-              'Date de Naissance: ${_userDetails['user']?['date_naissance'] ?? 'Non disponible'}',
-              style: TextStyle(fontSize: 18),
+              'Date de Naissance: ${_userDetails['date_naissance'] ??
+                  'Non disponible'}',
+              style: TextStyle(fontSize: 18, color: Colors.black),
             ),
           ],
         ),

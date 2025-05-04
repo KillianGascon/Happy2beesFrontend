@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:happytobees/pages/HomePage.dart';
 import 'package:happytobees/pages/Profile/ProfileDetailPage.dart';
 import 'package:happytobees/providers/auth_provider.dart';
 import 'package:happytobees/widgets/General/Navbar.dart';
@@ -18,24 +19,27 @@ class ProfileOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 24, color: Colors.black),
-          const SizedBox(width: 16),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-          ),
-          const Spacer(),
-          const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-        ],
+    return GestureDetector(
+      onTap: onTap, // Détection du tap ici
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 24, color: Colors.black),
+            const SizedBox(width: 16),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            ),
+            const Spacer(),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+          ],
+        ),
       ),
     );
   }
@@ -60,22 +64,12 @@ class ProfilePage extends StatelessWidget {
             child: Column(
               children: [
                 // Avatar
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: const NetworkImage(
-                    'https://via.placeholder.com/150', // Remplacez par l'URL de votre image
-                  ),
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(50),
-                        border: Border.all(color: Colors.white, width: 3),
-                      ),
-                      width: 20,
-                      height: 20,
-                    ),
+                Container(
+                  width: 100, // Diamètre du cercle
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.purple[100], // Couleur de fond
+                    shape: BoxShape.circle, // Forme circulaire
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -104,7 +98,7 @@ class ProfilePage extends StatelessWidget {
                   icon: Icons.person,
                   title: 'Profile details',
                   onTap: () {
-                    // Naviguer vers la page de détails du profil sans passer l'ID
+                    print("Redirection vers ProfileDetailPage...");
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -131,7 +125,15 @@ class ProfilePage extends StatelessWidget {
                   icon: Icons.logout,
                   title: 'Logout',
                   onTap: () {
-                    // Ajouter la logique pour Logout ici
+                    // Récupérer l'instance du AuthProvider et appeler la méthode clearAuthData pour effacer les données d'authentification
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    authProvider.clearAuthData();  // Efface les données d'authentification
+
+                    // Rediriger vers la page de login
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),  // Remplace LoginPage() par le widget de votre page de login
+                    );
                   },
                 ),
               ],
